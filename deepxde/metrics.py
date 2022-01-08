@@ -11,6 +11,8 @@ def accuracy(y_true, y_pred):
 def l2_relative_error(y_true, y_pred):
     return np.linalg.norm(y_true - y_pred) / np.linalg.norm(y_true)
 
+def l2error(y_true, y_pred):
+    return np.linalg.norm(y_true - y_pred) 
 
 def nanl2_relative_error(y_true, y_pred):
     """Return the L2 relative error treating Not a Numbers (NaNs) as zero."""
