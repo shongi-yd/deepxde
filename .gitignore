@@ -10,3 +10,7 @@ docs/_build/
 
 # VSCode
 .vscode/
+
+# Saved checkpoints and data
+model/*
+*.dat

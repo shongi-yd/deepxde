@@ -63,6 +63,7 @@ def get(identifier):
         "MAPE": mean_absolute_percentage_error,
         "max APE": max_absolute_percentage_error,
         "APE SD": absolute_percentage_error_std,
+        "l2error": l2error,
     }
 
     if isinstance(identifier, str):
