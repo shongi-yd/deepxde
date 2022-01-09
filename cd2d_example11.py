@@ -15,18 +15,25 @@ from deepxde.backend import tf
 def main():
     # Testing it for example 11
     def pde(x, u):
+        b1 = 2.0
+        b2 = 3.0
+        epsilon = 1.0
         du_xx = dde.grad.hessian(u, x,i=0, j=0)
         du_yy =dde.grad.hessian(u, x,i=0, j=1)
         du_x = dde.grad.jacobian(u, x, i=0, j=0)
         du_y = dde.grad.jacobian(u, x, i=0, j=1)
-        return -1e-7*(du_xx+du_yy) + 2*du_x + 3*du_y -1.0
+        print(du_xx)
+        return -(du_xx+du_yy) + 2*du_x + 3*du_y -(b1*x[1]*x[1] -b1*tf.exp(b2*(x[1]-1)/epsilon)+2*b2*x[0]*x[1]-2*b2*x[1]*tf.exp(b1*(x[0]-1)/epsilon)-(2*epsilon*x[0]) + (2* epsilon*tf.exp(b1*(x[0]-1)/epsilon)))
+        # return -1e-7*(du_xx+du_yy) + 2*du_x + 3*du_y -1.0
 
+        
     def boundary(x, on_boundary):
         return on_boundary
 
     def func(xe):
         u_exact = []
-        epsilon = 1e-7
+        epsilon = 1.0
+        # epsilon = 1e-7
         # print(xe)
         for x in xe:
             # print(f"shape of x:{x.shape}")
@@ -41,17 +48,18 @@ def main():
     bc = dde.DirichletBC(geom, func, boundary)
     data = dde.data.PDE(geom, pde, bc, num_domain = 2400, num_boundary =240, solution=func, num_test=3200)
 
-    layer_size = [2] + [12] * 3 + [1]
+    layer_size = [2] + [50] * 3 + [1]
     activation = "tanh"
     initializer = "Glorot uniform"
     net = dde.maps.FNN(layer_size, activation, initializer)
 
     model = dde.Model(data, net)
-    model.compile("adam", lr=0.001, metrics=["l2error"])
+    # model.compile("adam", lr=0.001, metrics=["l2error"])
+    model.compile("adam", lr=0.001, metrics=["l2 relative error"])
     #l2error, l2 relative error
 
     checkpointer = dde.callbacks.ModelCheckpoint(
-        "model/model.ckpt", verbose=1, save_better_only=True
+        "model/model.ckpt", verbose=0, save_better_only=True
     )
     # ImageMagick (https://imagemagick.org/) is required to generate the movie.
     # movie = dde.callbacks.MovieDumper(

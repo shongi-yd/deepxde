@@ -46,27 +46,27 @@ def main():
 
     geom = dde.geometry.Rectangle([0,0],[1,1])
     bc = dde.DirichletBC(geom, zerofunc, boundary)
-    data = dde.data.PDE(geom, pde, [bc], num_domain = 3500, num_boundary=3500, solution=func, num_test=3200)
+    data = dde.data.PDE(geom, pde, [bc], num_domain = 350, num_boundary=30, solution=func, num_test=3200)
     
-    layer_size = [2] + [12] * 3 + [1]
+    layer_size = [2] + [50] * 3 + [1]
     activation = "tanh"
     initializer = "Glorot uniform"
     net = dde.maps.FNN(layer_size, activation, initializer)
 
     model = dde.Model(data, net)
-    model.compile("adam", lr=0.001, metrics=["l2error"])
-    # model.compile("adam", lr=0.001, metrics=["l2 relative error"])
+    # model.compile("adam", lr=0.001, metrics=["l2error"])
+    model.compile("adam", lr=0.001, metrics=["l2 relative error"])
     #l2error, l2 relative error
 
     checkpointer = dde.callbacks.ModelCheckpoint(
-        "model/model.ckpt", verbose=1, save_better_only=True
+        "model/model.ckpt", verbose=0, save_better_only=True
     )
     # ImageMagick (https://imagemagick.org/) is required to generate the movie.
     # movie = dde.callbacks.MovieDumper(
     #     "model/movie", [-1], [1], period=200, save_spectrum=False, y_reference=func
     # )
     losshistory, train_state = model.train(
-        epochs=4000, callbacks=[checkpointer]
+        epochs=20000, callbacks=[checkpointer]
     )
 
     dde.saveplot(losshistory, train_state, issave=True, isplot=True)
